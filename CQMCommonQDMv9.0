@@ -1,22 +1,37 @@
-library CQMCommonQDM version '9.0.000'
+# CQMCommonQDM version 9.0.000
+The CQMCommonQDM library provides common functions and expressions used throughout electronic. Clinical Quality Measures (eCQM) published for use in Centers for Medicare and Medicaid (CMS) quality programs.
 
-/*Upversion to 9.0.000 renaming the library to CQMCommonQDM to align with the FHIR naming convention and to remove the old MAT designation*/
+## Using Quality Data Model (QDM) version '5.6'
 
-using QDM version '5.6'
+## Terminology
+```
 
 valueset "Emergency Department Visit": 'urn:oid:2.16.840.1.113883.3.117.1.7.1.292' 
 valueset "Encounter Inpatient": 'urn:oid:2.16.840.1.113883.3.666.5.307' 
 valueset "Intensive Care Unit": 'urn:oid:2.16.840.1.113762.1.4.1029.206' 
 valueset "Observation Services": 'urn:oid:2.16.840.1.113762.1.4.1111.143' 
 valueset "Outpatient Surgery Service": 'urn:oid:2.16.840.1.113762.1.4.1110.38' 
-
+```
+## Parameters
+```
 parameter "Measurement Period" Interval<DateTime>
-
+```
+## Context
+Within the Patient context, the results of any retrieve will always be scoped to a single patient, as determined by the environment. Patient-based or Encounter-based results will contain all data for a single patient within the Measurement Period as specified by the query constraints.
+```
 context Patient
+```
 
+## Expression `ED Encounter`
+Returns encounters with codes from the "Emergency Department Visit" value set.
+```
 define "ED Encounter":
   ["Encounter, Performed": "Emergency Department Visit"]
+```
 
+## Expression `Inpatient Encounter`
+Returns completed encounters with codes from the "Encounter Inpatient" value set when the inpatient discharge date falls within the Measurement Period.
+```
 define "Inpatient Encounter":
   ["Encounter, Performed": "Encounter Inpatient"] EncounterInpatient
     where EncounterInpatient.relevantPeriod ends during day of "Measurement Period"
